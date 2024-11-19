@@ -1,0 +1,30 @@
+rm(list = ls())                  
+options(warn = -1)              
+
+# Librerías
+library(foreign)                 
+library(stats) 
+library(tidyverse)
+library(readxl)
+library(caTools)
+
+#Cargar base de datos 
+datos=read_excel("3_vagoneras.xlsx")
+descriptor = read_excel("3_vagoneras.xlsx", sheet = "3_vagoneras_solo_codigo")
+
+
+# Variables independientes 
+variables_a_factor <- c("metro", "metrobus","taxi", "microbus", "camion", "combi", "trolebus", "cablebus", "mexibus", "rtp", "tren_ligero", "tren_suburbano", "autobus","lunes", "martes", "miercoles", "jueves", "viernes", "sabado", "domingo","afluencia_de_personas", "rinas", "trafico","fallas_mecanicas", "suicidios","no_especifico","asaltos","costo","ruta_mas_corta","tiempo","accesibilidad","areas_designadas","seguridad","no_otra_opcion")
+
+# De variables a factores 
+datos[variables_a_factor] <- lapply(datos[variables_a_factor], factor)
+
+# Ajuste del modelo
+resultados_logit = glm(binaria ~ metro + metrobus+taxi+microbus+camion+combi+trolebus+cablebus+mexibus+rtp+tren_ligero+tren_suburbano+autobus+lunes+martes+miercoles+jueves+viernes+sabado+domingo+afluencia_de_personas+rinas+trafico+fallas_mecanicas+suicidios+no_especifico+asaltos+costo+ruta_mas_corta+tiempo+accesibilidad+areas_designadas+seguridad+no_otra_opcion, 
+                       data = datos, 
+                       family = "binomial")
+
+summary(resultados_logit)
+
+# Interpretación
+exp(coefficients(resultados_logit)) %>% round(digits = 4) %>% data.frame()
